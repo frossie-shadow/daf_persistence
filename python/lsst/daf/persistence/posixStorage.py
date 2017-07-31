@@ -36,7 +36,7 @@ import yaml
 
 from . import (LogicalLocation, Persistence, Policy, StorageList,
                StorageInterface, Storage, ButlerLocation,
-               NoRepositroyAtRoot, RepositoryCfg)
+               NoRepositroyAtRoot, RepositoryCfg, doImport)
 from lsst.log import Log
 import lsst.pex.policy as pexPolicy
 from .safeFileIo import SafeFilename, safeMakeDir
@@ -263,12 +263,7 @@ class PosixStorage(StorageInterface):
         if pythonType is not None:
             if isinstance(pythonType, basestring):
                 # import this pythonType dynamically
-                pythonTypeTokenList = pythonType.split('.')
-                importClassString = pythonTypeTokenList.pop()
-                importClassString = importClassString.strip()
-                importPackage = ".".join(pythonTypeTokenList)
-                importType = __import__(importPackage, globals(), locals(), [importClassString], 0)
-                pythonType = getattr(importType, importClassString)
+                pythonType = doImport(pythonType)
         # todo this effectively defines the butler posix "do serialize" command to be named "put". This has
         # implications; write now I'm worried that any python type that can be written to disk and has a
         # method called 'put' will be called here (even if it's e.g. destined for FitsStorage).
@@ -334,13 +329,7 @@ class PosixStorage(StorageInterface):
         pythonType = butlerLocation.getPythonType()
         if pythonType is not None:
             if isinstance(pythonType, basestring):
-                # import this pythonType dynamically
-                pythonTypeTokenList = pythonType.split('.')
-                importClassString = pythonTypeTokenList.pop()
-                importClassString = importClassString.strip()
-                importPackage = ".".join(pythonTypeTokenList)
-                importType = __import__(importPackage, globals(), locals(), [importClassString], 0)
-                pythonType = getattr(importType, importClassString)
+                pythonType = doImport(pythonType)
 
         # see note re. discomfort with the name 'butlerWrite' in the write method, above.
         # Same applies to butlerRead.
