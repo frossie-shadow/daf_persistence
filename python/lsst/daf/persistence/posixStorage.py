@@ -140,22 +140,8 @@ class PosixStorage(StorageInterface):
         A RepositoryCfg instance or None
         """
         storage = Storage.makeFromURI(uri)
-        formatter = storage._getFormatter(RepositoryCfg)
-        return formatter.read(ButlerLocation(pythonType=None,
-                                             cppType=None,
-                                             storageName=None,
-                                             locationList='repositoryCfg.yaml',
-                                             dataId={},
-                                             mapper=None,
-                                             storage=storage,
-                                             usedDataId=None,
-                                             datasetType=None))
-
-    @staticmethod
-    def putRepositoryCfg(cfg, loc=None):
-        storage = Storage.makeFromURI(cfg.root if loc is None else loc, create=True)
-        formatter = storage._getFormatter(type(cfg))
-        formatter.write(cfg, ButlerLocation(pythonType=None,
+        readFormatter = storage._getReadFormatter(RepositoryCfg)
+        return readFormatter(ButlerLocation(pythonType=None,
                                             cppType=None,
                                             storageName=None,
                                             locationList='repositoryCfg.yaml',
@@ -164,6 +150,20 @@ class PosixStorage(StorageInterface):
                                             storage=storage,
                                             usedDataId=None,
                                             datasetType=None))
+
+    @staticmethod
+    def putRepositoryCfg(cfg, loc=None):
+        storage = Storage.makeFromURI(cfg.root if loc is None else loc, create=True)
+        writeFormatter = storage._getWriteFormatter(type(cfg))
+        writeFormatter(cfg, ButlerLocation(pythonType=None,
+                                           cppType=None,
+                                           storageName=None,
+                                           locationList='repositoryCfg.yaml',
+                                           dataId={},
+                                           mapper=None,
+                                           storage=storage,
+                                           usedDataId=None,
+                                           datasetType=None))
 
     @staticmethod
     def getMapperClass(root):
