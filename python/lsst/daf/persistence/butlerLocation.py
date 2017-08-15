@@ -211,7 +211,7 @@ class ButlerLocation(yaml.YAMLObject):
              self.additionalData, self.mapper, self.dataId)
 
     def __init__(self, pythonType, cppType, storageName, locationList, dataId, mapper, storage,
-                 usedDataId=None, datasetType=None):
+                 usedDataId=None, datasetType=None, additionalData=None):
         # pythonType is sometimes unicode with Python 2 and pybind11; this breaks the interpreter
         self.pythonType = str(pythonType) if isinstance(pythonType, basestring) else pythonType
         self.cppType = cppType
@@ -219,7 +219,7 @@ class ButlerLocation(yaml.YAMLObject):
         self.mapper = mapper
         self.storage = storage
         self.locationList = iterify(locationList)
-        self.additionalData = dafBase.PropertySet()
+        self.additionalData = additionalData if additionalData else dafBase.PropertySet()
         for k, v in dataId.items():
             self.additionalData.set(k, v)
         self.dataId = dataId
